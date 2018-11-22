@@ -1,0 +1,15 @@
+*.pyc
+.DS_Store
+.idea
+./tmp/image/*
+./tmp/video/*
+/*.py
+/*.txt
+venv/
+p_data
+m_learn
+/analyze_code/**/tree.*
+analyze_code/chapter6/demo/data/a.pdf
+*.log
+analyze_code/chapter3/demo/data/brew_install
+.ipynb_checkpoints*
