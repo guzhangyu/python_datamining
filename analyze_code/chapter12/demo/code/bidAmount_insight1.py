@@ -38,6 +38,28 @@ insight_dates,installs,spends,cpis= [],[],[],[]
 MIN_DATE=toDate('2018-11-08')
 MAX_DATE=toDate('2018-11-23')
 
+def plot_axs(datass,name):
+    fig = plt.figure(figsize=(12, 9))
+    l = "%s - %s" % (fb_application_id, country)
+    fig.suptitle(l + ' '+name)
+    ax1 = fig.gca()
+    for adsetIdIndex in range(0, len(datass)):
+        max_insight_dates=max_insight_datess[adsetIdIndex]
+        fb_adset_id = new_fb_adset_ids[adsetIdIndex]
+        color = randomcolor()
+        ax1.plot_date(max_insight_dates, datass[adsetIdIndex], color=color, ls='-', label=str(fb_adset_id))
+        if sum(rpt_fb_adactivitys['object_id'] == fb_adset_id) > 0:
+            datas = rpt_fb_adactivitys[rpt_fb_adactivitys['object_id'] == fb_adset_id]
+            # print("dates: %s" % dates)
+            # print(datas)
+            for k in datas.index:
+                data = datas.T[k]
+                date = data['date(event_time)']
+                strv = '%s -> %s' % (data['old_value'], data['new_value'])
+                ax1.axvline(date, color=color, ls='-')
+                ax1.text(x=date, y=max(datass[adsetIdIndex]) / 2, s=strv)
+
+    ax1.legend()
 
 
 for i in rpt_insight_alls.index:
@@ -47,32 +69,7 @@ for i in rpt_insight_alls.index:
         fb_adset_ids.append(fb_adset_id)
 
     if (fb_application_id, country) != (a['fb_application_id'],a['country']):
-        fig = plt.figure(figsize=(12,9))
-        l="%s - %s" % (fb_application_id,country)
-        fig.suptitle(l+' install')
-        # plt.setp(fig, 'name', 'your text', 'Numbertitle', 'off');
-        # plt.title(l)
-        # plt.figtext(0,0,l)
-        # plt.text(0,0,l)
-        # gtext(l)
-        # plt.uicontrol('Style', 'text', 'String', '第三种方法', 'Units', 'normalized', 'Position', [0.5 0.2 0.1 0.1])
-        # ax1 = fig.add_subplot(3, 1, 1,label=l+'installs')
-        ax1=fig.gca()
-        fig2 = plt.figure(figsize=(12,9))
-        fig2.suptitle(l + ' spend')
-        ax2=fig2.gca()
-        # ax2 = fig.add_subplot(3, 1, 2,label='spends')
-        fig3 = plt.figure(figsize=(12,9))
-        fig3.suptitle(l + ' cpi')
-        ax3=fig3.gca()
-        # ax3 = fig.add_subplot(3, 1, 3,label='cpis')
-
-        # max_insight_dates=set()
-        # for id in insight_datess:
-        #     max_insight_dates=max_insight_dates.union(set(id))
-        # max_insight_dates=list(max_insight_dates)
-        # max_insight_dates=sorted(max_insight_dates)
-
+        new_installss,new_spendss,new_cpiss,max_insight_datess,new_fb_adset_ids=[],[],[],[],fb_adset_ids
         for adsetIdIndex in range(0, len(insight_datess)):
             insight_dates=insight_datess[adsetIdIndex]
             installs=installss[adsetIdIndex]
@@ -82,10 +79,11 @@ for i in rpt_insight_alls.index:
             min_insight_date = max(MIN_DATE , toDate(fb_create_times[adsetIdIndex]))
             max_insight_date = min(MAX_DATE, toDate(arichived_time[adsetIdIndex]))
             new_installs,new_spends,new_cpis=[],[],[]
-            # print(min_insight_date, max_insight_date)
-            # print(arichived_time[adsetIdIndex],toDate(arichived_time[adsetIdIndex]),type(arichived_time[adsetIdIndex])==float)
+            new_installss.append(new_installs)
+            new_spendss.append(new_spends)
+            new_cpiss.append(new_spends)
             max_insight_dates = pd.date_range(min_insight_date, max_insight_date)
-            # print(max_insight_dates)
+            max_insight_datess.append(max_insight_dates)
             for dt in max_insight_dates:
                 if dt in insight_dates:
                     index=insight_dates.index(dt)
@@ -97,31 +95,9 @@ for i in rpt_insight_alls.index:
                     new_spends.append(0)
                     new_cpis.append(None)
 
-            color = randomcolor()
-
-            ax1.plot_date(max_insight_dates, new_installs, color=color, ls='-',label= str(fb_adset_id))
-            ax2.plot_date(max_insight_dates, new_spends, color=color, ls='-',label=str(fb_adset_id))
-            ax3.plot_date(max_insight_dates, new_cpis, color=color, ls='-',label=str(fb_adset_id))
-            fb_adset_id=fb_adset_ids[adsetIdIndex]
-            if sum(rpt_fb_adactivitys['object_id']==fb_adset_id)>0:
-                datas=rpt_fb_adactivitys[rpt_fb_adactivitys['object_id']==fb_adset_id]
-                # print("dates: %s" % dates)
-                # print(datas)
-                for k in datas.index:
-                    data = datas.T[k]
-                    date = data['date(event_time)']
-                    strv = '%s -> %s' % (data['old_value'],data['new_value'])
-                    ax1.axvline(date, color=color, ls='-')
-                    ax1.text(x=date,y=max(installs)/2,s=strv)
-                    # ax2.vlines(date, min(spends), max(spends), colors=color, linestyles='-')
-                    ax2.axvline(date, color=color, ls='-')
-                    ax2.text(x=date,y= max(spends) / 2, s=strv)
-                    # ax3.vlines(date, min(cpis), max(cpis), colors=color, linestyles='-')
-                    ax3.axvline(date, color=color, ls='-')
-                    ax3.text(x=date,y= max(cpis) / 2, s=strv)
-        ax1.legend()
-        ax2.legend()
-        ax3.legend()
+        plot_axs(new_installs,' installs ')
+        plot_axs(new_spends, ' spends ')
+        plot_axs(new_cpis, ' cpis ')
         insight_datess, installss, spendss, cpiss, fb_adset_ids,fb_create_times,arichived_time  = [], [], [], [], [],[],[]
 
     if fb_adset_id != a['fb_adset_id']:
