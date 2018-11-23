@@ -1,5 +1,7 @@
 import pandas as pd
 import json
+import datetime
+import numpy as np
 
 
 import random
@@ -10,20 +12,33 @@ def randomcolor():
         color += colorArr[random.randint(0,14)]
     return "#"+color
 
+def toDate(str):
+    if not str or type(str) == float or '0001' == str[:4]:
+        return datetime.date.max
+    # print(type(str))
+    # print(type(str) == float)
+    str=str[:10]
+    # print(str)
+    return datetime.datetime.strptime(str,"%Y-%m-%d").date()
+
 rpt_fb_adactivitys=pd.read_csv('~/Downloads/rpt_fb_adactivity (2).csv')
 rpt_fb_adactivitys['old_value']=rpt_fb_adactivitys['extra_data'].apply(lambda a:json.loads(a)['additional_value']['old_value'] )
 rpt_fb_adactivitys['new_value']=rpt_fb_adactivitys['extra_data'].apply(lambda a:json.loads(a)['additional_value']['new_value'] )
 rpt_fb_adactivitys['insight_date']=rpt_fb_adactivitys['date(event_time)']
 
-rpt_insight_alls=pd.read_csv('~/Downloads/fa (1).csv')
+rpt_insight_alls=pd.read_csv('~/Downloads/fa (2).csv')
 import matplotlib.pyplot as plt
 plt.rcParams['font.sans-serif'] = ['SimHei']
 plt.rcParams['font.size'] = 6
 
 rpt_insight_alls=rpt_insight_alls.sort_values(by=['fb_application_id','country','fb_adset_id','insight_date'])
 fb_application_id,country,fb_adset_id=None,None,None
-insight_datess,installss,spendss,cpiss,fb_adset_ids = [],[],[],[],[]
+insight_datess,installss,spendss,cpiss,fb_adset_ids,fb_create_times,arichived_time = [],[],[],[],[],[],[]
 insight_dates,installs,spends,cpis= [],[],[],[]
+MIN_DATE=toDate('2018-11-08')
+MAX_DATE=toDate('2018-11-23')
+
+
 
 for i in rpt_insight_alls.index:
     a=rpt_insight_alls.T[i]
@@ -52,11 +67,11 @@ for i in rpt_insight_alls.index:
         ax3=fig3.gca()
         # ax3 = fig.add_subplot(3, 1, 3,label='cpis')
 
-        max_insight_dates=set()
-        for id in insight_datess:
-            max_insight_dates=max_insight_dates.union(set(id))
-        max_insight_dates=list(max_insight_dates)
-        max_insight_dates=sorted(max_insight_dates)
+        # max_insight_dates=set()
+        # for id in insight_datess:
+        #     max_insight_dates=max_insight_dates.union(set(id))
+        # max_insight_dates=list(max_insight_dates)
+        # max_insight_dates=sorted(max_insight_dates)
 
         for adsetIdIndex in range(0, len(insight_datess)):
             insight_dates=insight_datess[adsetIdIndex]
@@ -64,7 +79,13 @@ for i in rpt_insight_alls.index:
             spends=spendss[adsetIdIndex]
             cpis=cpiss[adsetIdIndex]
 
+            min_insight_date = max(MIN_DATE , toDate(fb_create_times[adsetIdIndex]))
+            max_insight_date = min(MAX_DATE, toDate(arichived_time[adsetIdIndex]))
             new_installs,new_spends,new_cpis=[],[],[]
+            # print(min_insight_date, max_insight_date)
+            # print(arichived_time[adsetIdIndex],toDate(arichived_time[adsetIdIndex]),type(arichived_time[adsetIdIndex])==float)
+            max_insight_dates = pd.date_range(min_insight_date, max_insight_date)
+            # print(max_insight_dates)
             for dt in max_insight_dates:
                 if dt in insight_dates:
                     index=insight_dates.index(dt)
@@ -77,6 +98,7 @@ for i in rpt_insight_alls.index:
                     new_cpis.append(None)
 
             color = randomcolor()
+
             ax1.plot_date(max_insight_dates, new_installs, color=color, ls='-',label= str(fb_adset_id))
             ax2.plot_date(max_insight_dates, new_spends, color=color, ls='-',label=str(fb_adset_id))
             ax3.plot_date(max_insight_dates, new_cpis, color=color, ls='-',label=str(fb_adset_id))
@@ -100,10 +122,12 @@ for i in rpt_insight_alls.index:
         ax1.legend()
         ax2.legend()
         ax3.legend()
-        insight_datess, installss, spendss, cpiss, fb_adset_ids = [], [], [], [], []
+        insight_datess, installss, spendss, cpiss, fb_adset_ids,fb_create_times,arichived_time  = [], [], [], [], [],[],[]
 
     if fb_adset_id != a['fb_adset_id']:
         fb_adset_ids.append(fb_adset_id)
+        fb_create_times.append(a['fb_create_time'])
+        arichived_time.append(a['archived_time'])
 
         insight_dates, installs, spends, cpis = [], [], [], []
         insight_datess.append(insight_dates)
