@@ -13,3 +13,4 @@ analyze_code/chapter6/demo/data/a.pdf
 *.log
 analyze_code/chapter3/demo/data/brew_install
 .ipynb_checkpoints*
+/tmp/
