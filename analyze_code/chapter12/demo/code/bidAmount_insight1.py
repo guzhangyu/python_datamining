@@ -47,6 +47,9 @@ insight_datess.append(insight_dates)
 spendss.append(spends)
 cpiss.append(cpis)
 
+def is_empty(d):
+    return d is None or d==0
+
 def plot_axs1(datass,name):
     # print(datass)
     new_datas2,new_fb_adset_ids,max_insight_datess1,fb_create_times1=split_data(datass)
@@ -58,16 +61,18 @@ def plot_axs(datassi,name,new_fb_adset_ids,max_insight_datess1,fb_create_timess,
     l = "%s-%s" % (fb_application_id, country)
     fig.suptitle(l + ' '+name)
     ax1 = fig.gca()
+    needSave=False
     for adsetIdIndex in range(0, len(datassi)):
         max_insight_dates=max_insight_datess1[adsetIdIndex]
         fb_adset_id = new_fb_adset_ids[adsetIdIndex]
         color = randomcolor()
         # print(max_insight_dates, datass[adsetIdIndex])
-        ax1.plot_date(max_insight_dates, datassi[adsetIdIndex], color=color, ls='-') #, label=str(fb_adset_id)
+
         if sum(rpt_fb_adactivitys['object_id'] == fb_adset_id) > 0:
             datas = rpt_fb_adactivitys[rpt_fb_adactivitys['object_id'] == fb_adset_id]
             # print("dates: %s" % dates)
             # print(datas)
+            has=False
             for k in datas.index:
                 data = datas.T[k]
                 date = str2Date(data['date(event_time)'])
@@ -77,14 +82,24 @@ def plot_axs(datassi,name,new_fb_adset_ids,max_insight_datess1,fb_create_timess,
                 ax1.axvline(date, color=color, ls='-')
                 cur_dates=[a.date() for a in max_insight_dates]
                 if date in cur_dates:
-                    y=datassi[adsetIdIndex][cur_dates.index(date)]
+                    idx=cur_dates.index(date)
+                    y=datassi[adsetIdIndex][idx]
+                    if is_empty(datassi[idx-1]) and is_empty(datassi[idx]) and is_empty(datassi[idx+1]):
+                        print('already empty')
+                        continue
                 else:
-                    y=max(datassi[adsetIdIndex])
-                    print("warn! %s not in %s" %(date,cur_dates))
+                    continue
+                    # y=max(datassi[adsetIdIndex])
+                    # print("warn! %s not in %s" %(date,cur_dates))
                 ax1.text(x=date, y=y*1.1, s=strv,color=color)
+                has=True
+            if has:
+                needSave=True
+                ax1.plot_date(max_insight_dates, datassi[adsetIdIndex], color=color, ls='-')  # , label=str(fb_adset_id)
 
-    ax1.legend(loc='best')
-    fig.savefig(fname='/Users/zhangyugu/python_works/tmp/images1/%s-%d-%s.png' % (l,indexNo,name))
+    if needSave:
+        ax1.legend(loc='best')
+        fig.savefig(fname='/Users/zhangyugu/python_works/tmp/images3/%s-%d-%s.png' % (l,indexNo,name))
 
 def split_data(datass):
     maxs=[]
