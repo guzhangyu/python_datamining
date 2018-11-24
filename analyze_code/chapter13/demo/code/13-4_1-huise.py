@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 import numpy as np
 import pandas as pd
-from GM11 import GM11 #引入自己编写的灰色预测函数
+from GM11 import GM11 #引入自己编写的灰色预测函数,将每一列的最后两个值灰色化
 
 inputfile = '../data/data1.csv' #输入的数据文件
 outputfile = '../tmp/data1_GM11.xls' #灰色预测后保存的路径

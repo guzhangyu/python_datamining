@@ -10,11 +10,12 @@ class LassoModel:
         import glmnet_py as gp
         X = np.array(data.iloc[:, :-1])
         y = np.array(data.iloc[:, -1])
+        #一维连续因变量
         f = glmnet(x=X, y=y, family='gaussian', alpha=0, standardize=True)  # parallel=True,
 
         #lambda 是惩罚系数 alpha=0 表示线性
         d = gp.glmnetCoef(f, s=np.array([min(f['lambdau'])]))
-        w3 = 1 / np.abs(d[1:( X.shape[1] + 1)])
+        w3 = 1 / np.abs(d[1:(X.shape[1] + 1)])
         f = glmnet(x=X, y=y, family='gaussian', alpha=1, standardize=True, penalty_factor=w3)  # parallel=True,
         # print(sum(w3==Inf))
         coef_=gp.glmnetCoef(f, s=np.array([min(f['lambdau'])]))
@@ -40,7 +41,6 @@ class LassoModel:
 
     def predict(self,data):
         data_train=data.loc[:len(data)-3]
-        # print(data_train)
         data_mean = data_train.mean()
         data_std = data_train.std()
         data_train = (data_train - data_mean) / data_std  # 数据标准化
