@@ -15,13 +15,13 @@ class LassoModel:
 
         #lambda 是惩罚系数 alpha=0 表示线性
         d = gp.glmnetCoef(f, s=np.array([min(f['lambdau'])]))
-        w3 = 1 / np.abs(d[1:(X.shape[1] + 1)])
+        w3 = 1 / np.abs(d[1:(X.shape[1] + 1)]) #惩罚系数
         f = glmnet(x=X, y=y, family='gaussian', alpha=1, standardize=True, penalty_factor=w3)  # parallel=True,
         # print(sum(w3==Inf))
         coef_=gp.glmnetCoef(f, s=np.array([min(f['lambdau'])]))
         coef_=np.reshape(coef_,(1,-1))[0]
         # print(coef_)
-        self.columns = data.columns[coef_ != 0][:-1]
+        self.columns = data.columns[coef_ != 0][:-1] #抛弃临界的最后一个
 
     def fit(self,data):
         from sklearn.linear_model import Lasso
@@ -71,8 +71,6 @@ class LassoModel:
         p = data[['y', 'y_pred']].plot(style=['b-o', 'r-*'])
         plt.show()
 
-
-
     def adaptive_lasso(self,pre_data):
         import numpy as np
         from sklearn.linear_model import Lasso
@@ -111,14 +109,13 @@ class LassoModel:
             print(p_obj(coef_))  # should go down
 
 
+if __name__ == '__main__':
+    import pandas as pd
 
-
-
-import pandas as pd
-inputfile = '../data/data1.csv' #输入的数据文件
-data = pd.read_csv(inputfile) #读取数据
-model=LassoModel(data)
-model.glmnet(data)
-# model.fit(data)
-model.gray(data)
-model.predict(data)
+    inputfile = '../data/data1.csv'  # 输入的数据文件
+    data = pd.read_csv(inputfile)  # 读取数据
+    model = LassoModel(data)
+    model.glmnet(data)
+    # model.fit(data)
+    model.gray(data)
+    model.predict(data)

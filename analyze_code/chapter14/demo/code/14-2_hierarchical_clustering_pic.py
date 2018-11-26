@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import linkage,dendrogram
 #这里使用scipy的层次聚类函数
 
+data=data.drop(index=data.index[10:])
+print(data)
 Z = linkage(data, method = 'ward', metric = 'euclidean') #谱系聚类图
+print(Z)
 P = dendrogram(Z, 0) #画谱系聚类图
 plt.show()

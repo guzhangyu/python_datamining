@@ -32,4 +32,5 @@ for i in range(k): #逐一作图，作出不同样式
   plt.xticks(range(1, 5), xlabels, rotation = 20) #坐标标签
   plt.title(u'商圈类别%s' %(i+1)) #我们计数习惯从1开始
   plt.subplots_adjust(bottom=0.15) #调整底部
-  plt.savefig(u'%s%s.png' %(pic_output, i+1)) #保存图片
+  # plt.savefig(u'%s%s.png' %(pic_output, i+1)) #保存图片
+plt.show()

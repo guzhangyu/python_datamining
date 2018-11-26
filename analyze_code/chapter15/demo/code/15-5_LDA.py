@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 import pandas as pd
 
+#评价语句的主题分析
 #参数初始化
 negfile = '../data/meidi_jd_neg_cut.txt'
 posfile = '../data/meidi_jd_pos_cut.txt'
