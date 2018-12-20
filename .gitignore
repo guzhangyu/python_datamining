@@ -14,3 +14,5 @@ analyze_code/chapter6/demo/data/a.pdf
 analyze_code/chapter3/demo/data/brew_install
 .ipynb_checkpoints*
 /tmp/
+/live/item_recommend/data
+/live/item_recommend

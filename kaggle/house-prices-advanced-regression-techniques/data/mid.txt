@@ -1,0 +1,1 @@
+schema=StructType([StructField("user_id",LongType(),False),StructField("item_id",LongType(),False),StructField("behavior_type",IntegerType(),True),StructField("user_geohash",StringType(),True),StructField("item_category",IntegerType(),True),StructField("time",TimestampType(),True)])
